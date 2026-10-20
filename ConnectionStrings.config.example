@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Copy this file to ConnectionStrings.config and put your own MySQL details in it.
+  ConnectionStrings.config is listed in .gitignore, so your password never reaches GitHub.
+-->
+<connectionStrings>
+  <add name="ePoliceDb"
+       connectionString="Server=localhost;Port=3306;Database=mydb;User Id=YOUR_MYSQL_USER;Password=YOUR_MYSQL_PASSWORD;"
+       providerName="MySql.Data.MySqlClient" />
+</connectionStrings>

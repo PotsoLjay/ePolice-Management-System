@@ -486,6 +486,7 @@
             <a href="#delete" id="delLink" class="delBox" runat="server" onclick="linkDel_Click">Delete Operation</a>
             <a href="#view" id="viewLink" runat="server" onclick="linkView_Click">View/Search</a>
             <a href="#update" id="updatelink" runat="server" onclick="linkUpdate_Click">Update Admins</a>
+            <a href="Registration.aspx" id="regAdminLink" runat="server">Register Admin</a>
         </div>
 
         <asp:HyperLink ID="HyperLink1" runat="server">HyperLink</asp:HyperLink>
@@ -682,7 +683,7 @@
                 <br />
                 </span></strong></label></div>
                 <div class="form-group">
-                    <asp:Button ID="btnDeleteCase" runat="server" OnClick="btnDeleteCase_Click" Text="Delete Case" />
+                    <asp:Button ID="btnDeleteCase" runat="server" OnClick="btnDeleteCase_Click" OnClientClick="return confirm('Delete this record? This cannot be undone.');" Text="Delete Case" />
                     <br />
                 <strong><span class="auto-style1">
                 <asp:Label ID="lblDelete" runat="server" ForeColor="#FFFF99"></asp:Label>
@@ -695,7 +696,7 @@
                  <br />
                  </span></strong></label></div>
                  <div class="form-group">
-                     <asp:Button ID="Button1" runat="server"  Text="Delete Victim" OnClick="Button1_Click" />
+                     <asp:Button ID="Button1" runat="server"  Text="Delete Victim" OnClick="Button1_Click" OnClientClick="return confirm('Delete this record? This cannot be undone.');" />
                      <br />
                  <strong><span class="auto-style1">
                  <asp:Label ID="Label11" runat="server" ForeColor="#FFFF99"></asp:Label>
@@ -708,7 +709,7 @@
                  <br />
                  </span></strong></label></div>
                  <div class="form-group">
-                     <asp:Button ID="Button2" runat="server" Text="Delete Suspect" OnClick="Button2_Click" />
+                     <asp:Button ID="Button2" runat="server" Text="Delete Suspect" OnClick="Button2_Click" OnClientClick="return confirm('Delete this record? This cannot be undone.');" />
                      <br />
                  <strong><span class="auto-style1">
                  <asp:Label ID="Label12" runat="server" ForeColor="#FFFF99"></asp:Label>
@@ -721,7 +722,7 @@
                  <br />
                  </span></strong></label></div>
                  <div class="form-group">
-                     <asp:Button ID="Button5" runat="server"  Text="Delete Document" OnClick="Button5_Click" />
+                     <asp:Button ID="Button5" runat="server"  Text="Delete Document" OnClick="Button5_Click" OnClientClick="return confirm('Delete this record? This cannot be undone.');" />
                      <br />
                  <strong><span class="auto-style1">
                  <asp:Label ID="Label13" runat="server" ForeColor="#FFFF99"></asp:Label>
@@ -734,7 +735,7 @@
                  <br />
                  </span></strong></label></div>
                  <div class="form-group">
-                     <asp:Button ID="Button6" runat="server"  Text="Delete Evidence" OnClick="Button6_Click" />
+                     <asp:Button ID="Button6" runat="server"  Text="Delete Evidence" OnClick="Button6_Click" OnClientClick="return confirm('Delete this record? This cannot be undone.');" />
                      <br />
                  <strong><span class="auto-style1">
                  <asp:Label ID="Label14" runat="server" ForeColor="#FFFF99"></asp:Label>
@@ -747,7 +748,7 @@
                 <br />
                 </span></strong></label></div>
                 <div class="form-group">
-                    <asp:Button ID="Button7" runat="server" Text="Delete Admin" OnClick="Button7_Click" />
+                    <asp:Button ID="Button7" runat="server" Text="Delete Admin" OnClick="Button7_Click" OnClientClick="return confirm('Delete this record? This cannot be undone.');" />
                     <br />
                 <strong><span class="auto-style1">
                 <asp:Label ID="Label16" runat="server" ForeColor="#FFFF99"></asp:Label>

@@ -20,4 +20,4 @@ packages/
 
 # Local database settings (copy ConnectionStrings.config.example)
 ConnectionStrings.config
-/ConnectionStrings.config.example
+

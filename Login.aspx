@@ -120,44 +120,74 @@
     </style>
 </head>
 <body>
-     <div class="header">
-        <asp:Image ID="Image2" runat="server" ImageUrl="~/Images/logo.png" CssClass="sidebar-logo" AlternateText="Logo" />
-        <asp:Label ID="Label10" runat="server" Text="ePolice" ForeColor="White" Font-Size="30px"></asp:Label>
-     </div>
+    <!-- Header section containing the logo and application name -->
+    <div class="header">
+        <asp:Image ID="Image2" runat="server"
+            ImageUrl="~/Images/logo.png"
+            CssClass="sidebar-logo"
+            AlternateText="Logo" />
+
+        <asp:Label ID="Label10" runat="server"
+            Text="ePolice"
+            ForeColor="White"
+            Font-Size="30px"></asp:Label>
+    </div>
+
+    <!-- Main form for user login -->
     <form id="form1" runat="server">
+
+        <!-- Background image section -->
         <div class="bgImage">
             <img src="Images/3832.jpg"/>
         </div>
+
+        <!-- Login container -->
         <div class="login-container">
+
+            <!-- Role selection: Admin or Officer -->
             <div class="form-group">
                 <label for="ddlRole">Select Role:</label>
-                <asp:DropDownList ID="ddlRole" runat="server" AutoPostBack="True">
+                <asp:DropDownList ID="ddlRole" runat="server"
+                    AutoPostBack="True">
                     <asp:ListItem>Admin</asp:ListItem>
                     <asp:ListItem>Officer</asp:ListItem>
                 </asp:DropDownList>
             </div>
 
+            <!-- User ID input field -->
             <div class="form-group">
-                <asp:Label ID="lblID" runat="server" Text="Admin ID:"></asp:Label>
+                <asp:Label ID="lblID" runat="server"
+                    Text="Admin ID:"></asp:Label>
                 <asp:TextBox ID="txtLoginAdmin" runat="server"></asp:TextBox>
             </div>
 
+            <!-- Password input field -->
             <div class="form-group">
-                <asp:Label ID="lblPassword" runat="server" Text="Password:"></asp:Label>
-                <asp:TextBox ID="txtLoginPass" runat="server" TextMode="Password"></asp:TextBox>
+                <asp:Label ID="lblPassword" runat="server"
+                    Text="Password:"></asp:Label>
+                <asp:TextBox ID="txtLoginPass" runat="server"
+                    TextMode="Password"></asp:TextBox>
             </div>
 
+            <!-- Login button and message label -->
             <div class="form-group">
-                <asp:Button ID="btnLogin1" runat="server" Text="Login" OnClick="btnLogin_Click" BackColor="Black" />
+                <asp:Button ID="btnLogin1" runat="server"
+                    Text="Login"
+                    OnClick="btnLogin_Click"
+                    BackColor="Black" />
                 <br />
                 <asp:Label ID="lblMessage" runat="server"></asp:Label>
             </div>
 
+            <!-- Registration link, hidden by default -->
             <div class="form-group">
-                <span>or</span><br />
-                <br />
-                <asp:HyperLink ID="hplRegister" runat="server" NavigateUrl="~/Registration.aspx">Register</asp:HyperLink>
+                <!--<span>or</span><br />
+                <br />-->
+                <asp:HyperLink ID="hplRegister" runat="server"
+                    NavigateUrl="~/Registration.aspx"
+                    Visible="False">Register</asp:HyperLink>
             </div>
+
         </div>
     </form>
 </body>

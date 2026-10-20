@@ -10,6 +10,7 @@ using iTextSharp.text;
 using iTextSharp.text.html.simpleparser;
 using iTextSharp.text.pdf;
 using MySql.Data.MySqlClient;
+using EPOLICE;
 
 public partial class Homepage : System.Web.UI.Page
 {
@@ -20,7 +21,14 @@ public partial class Homepage : System.Web.UI.Page
 
     protected void Page_Load(object sender, EventArgs e)
     {
-        string connStr = "Server=localhost;User Id=root;Password=root;Database=mydb;";
+        // Nobody gets past this page without logging in first.
+        if (Session["AdminID"] == null && Session["LoginState"] == null)
+        {
+            Response.Redirect("Login.aspx", true);
+            return;
+        }
+
+        string connStr = Db.ConnectionString;
         MySqlConnection conn = new MySqlConnection(connStr);
 
         if (Session["LoginState"] !=null)
@@ -34,6 +42,7 @@ public partial class Homepage : System.Web.UI.Page
                 register.Visible = false;
                 update.Visible = false;
                 delete.Visible = false;
+                regAdminLink.Visible = false;
             }
         }
 
@@ -46,6 +55,8 @@ public partial class Homepage : System.Web.UI.Page
             {
                 gvAdmin.Visible = false;
                 updatelink.Visible = false;
+                update.Visible = false;
+                regAdminLink.Visible = false;
             }
         }
 
@@ -95,7 +106,7 @@ public partial class Homepage : System.Web.UI.Page
         gvWitnesses.DataSource = ds;
         gvWitnesses.DataBind();
 
-        string displayAdmins= "SELECT * FROM administrator";
+        string displayAdmins= "SELECT Admin_ID, Admin_First_Name, Admin_Last_Name, Phone_Num, Email FROM administrator";
         adap = new MySqlDataAdapter(displayAdmins, conn);
         ds = new DataSet();
         adap.Fill(ds);
@@ -107,7 +118,7 @@ public partial class Homepage : System.Web.UI.Page
 
     protected void btnRegisterCase_Click(object sender, EventArgs e)
     {
-        string connStr = "Server=localhost;User Id=root;Password=root;Database=mydb;";
+        string connStr = Db.ConnectionString;
         MySqlConnection conn = new MySqlConnection(connStr);
 
         conn.Open();
@@ -129,8 +140,6 @@ public partial class Homepage : System.Web.UI.Page
 
 
         lblMessage.Text = "Case registered successfully! Case Number: " + caseId;
-        Response.Write("txtLocation: " + txtLocation.Text + "<br>");
-        Response.Write("ddlCrimes: " + ddlCrimes.SelectedItem?.Text + "<br>");
 
         // Save Case_ID in session for later use
         Session["CaseID"] = caseId;
@@ -159,7 +168,7 @@ public partial class Homepage : System.Web.UI.Page
                         Directory.CreateDirectory(uploadFolderPath);
                     }
 
-                    string fileName = Path.GetFileName(FileUploadImage.FileName);
+                    string fileName = Guid.NewGuid().ToString("N") + fileExtension; // unique name so uploads never overwrite each other
                     string filePath = Path.Combine(uploadFolderPath, fileName);
 
                     FileUploadImage.SaveAs(filePath);
@@ -194,7 +203,7 @@ public partial class Homepage : System.Web.UI.Page
 
     protected void btnRegComplainant_Click(object sender, EventArgs e)
     {
-        string connStr = "Server=localhost;User Id=root;Password=root;Database=mydb;";
+        string connStr = Db.ConnectionString;
         MySqlConnection conn = new MySqlConnection(connStr);
 
         conn.Open();
@@ -234,7 +243,7 @@ public partial class Homepage : System.Web.UI.Page
 
     protected void Button3_Click(object sender, EventArgs e)
     {
-        string connStr = "Server=localhost;User Id=root;Password=root;Database=mydb;";
+        string connStr = Db.ConnectionString;
         MySqlConnection conn = new MySqlConnection(connStr);
 
         conn.Open();
@@ -270,13 +279,13 @@ public partial class Homepage : System.Web.UI.Page
 
 
         comm.ExecuteNonQuery();
-        lblDisplayVictim0.Text = "Victim registered successfully! Victim Number: " + txtSuspectNum.Text;
+        lblDisplayVictim0.Text = "Suspect registered successfully! Suspect Number: " + txtSuspectNum.Text;
 
     }
 
     protected void Button4_Click(object sender, EventArgs e)
     {
-        string connStr = "Server=localhost;User Id=root;Password=root;Database=mydb;";
+        string connStr = Db.ConnectionString;
         MySqlConnection conn = new MySqlConnection(connStr);
 
         conn.Open();
@@ -314,14 +323,14 @@ public partial class Homepage : System.Web.UI.Page
 
 
         comm.ExecuteNonQuery();
-        lblDisplayVictim1.Text = "Victim registered successfully! Victim Number: " + txtEvidenceNum.Text;
+        lblDisplayVictim1.Text = "Evidence registered successfully! Evidence Number: " + txtEvidenceNum.Text;
     }
 
     protected void btnCaseDocument_Click(object sender, EventArgs e)
     {
         int adminId = Convert.ToInt32(Session["AdminID"]);
 
-        string connStr = "Server=localhost;User Id=root;Password=root;Database=mydb;";
+        string connStr = Db.ConnectionString;
         MySqlConnection conn = new MySqlConnection(connStr);
 
         conn.Open();
@@ -351,7 +360,7 @@ public partial class Homepage : System.Web.UI.Page
 
     protected void btnDeleteCase_Click(object sender, EventArgs e)
     {
-        string connStr = "Server=localhost;User Id=root;Password=root;Database=mydb;";
+        string connStr = Db.ConnectionString;
         MySqlConnection conn = new MySqlConnection(connStr);
 
         conn.Open();
@@ -366,7 +375,7 @@ public partial class Homepage : System.Web.UI.Page
 
     protected void btnUpdateCase_Click(object sender, EventArgs e)
     {
-        string connStr = "Server=localhost;User Id=root;Password=root;Database=mydb;";
+        string connStr = Db.ConnectionString;
         MySqlConnection conn = new MySqlConnection(connStr);
 
         conn.Open();
@@ -387,7 +396,7 @@ public partial class Homepage : System.Web.UI.Page
 
     protected void btnUpdateComplainant_Click(object sender, EventArgs e)
     {
-        string connStr = "Server=localhost;User Id=root;Password=root;Database=mydb;";
+        string connStr = Db.ConnectionString;
         MySqlConnection conn = new MySqlConnection(connStr);
 
         conn.Open();
@@ -412,7 +421,7 @@ public partial class Homepage : System.Web.UI.Page
 
             if (!IsPostBack)
             {
-                lblDisplayVictim.Text = "Case number " + txtCaseNum.Text + " was updated successfully!";
+                lblDisplayVictim.Text = "Victim number " + txtVictimNum.Text + " was updated successfully!";
             }
         }
         catch (MySqlException ex)
@@ -428,7 +437,7 @@ public partial class Homepage : System.Web.UI.Page
 
     protected void btnUpdateSuspect_Click(object sender, EventArgs e)
     {
-        string connStr = "Server=localhost;User Id=root;Password=root;Database=mydb;";
+        string connStr = Db.ConnectionString;
         MySqlConnection conn = new MySqlConnection(connStr);
 
         conn.Open();
@@ -451,7 +460,7 @@ public partial class Homepage : System.Web.UI.Page
 
     protected void btnDeleteComplainant_Click(object sender, EventArgs e)
     {
-        string connStr = "Server=localhost;User Id=root;Password=root;Database=mydb;";
+        string connStr = Db.ConnectionString;
         using (MySqlConnection conn = new MySqlConnection(connStr))
         {
             conn.Open();
@@ -475,7 +484,7 @@ public partial class Homepage : System.Web.UI.Page
 
     protected void btnDeleteSuspect_Click(object sender, EventArgs e)
     {
-        string connStr = "Server=localhost;User Id=root;Password=root;Database=mydb;";
+        string connStr = Db.ConnectionString;
         using (MySqlConnection conn = new MySqlConnection(connStr))
         {
             conn.Open();
@@ -510,7 +519,7 @@ public partial class Homepage : System.Web.UI.Page
         // Retrieve the image path from the session
         string photoUrl = Session["EvidenceImageUrl"].ToString();
 
-        string connStr = "Server=localhost;User Id=root;Password=root;Database=mydb;";
+        string connStr = Db.ConnectionString;
         MySqlConnection conn = new MySqlConnection(connStr);
 
         try
@@ -554,7 +563,7 @@ public partial class Homepage : System.Web.UI.Page
     protected void btnUpdateEvidence_Click(object sender, EventArgs e)
     {
         // 1. Get connection string and establish connection
-        string connStr = "Server=localhost;User Id=root;Password=root;Database=mydb;";
+        string connStr = Db.ConnectionString;
         MySqlConnection conn = new MySqlConnection(connStr);
 
         try
@@ -602,7 +611,7 @@ public partial class Homepage : System.Web.UI.Page
                 }
 
                 // Generate a unique filename or use original and save the uploaded image
-                string fileName = Path.GetFileName(FileUploadImage.FileName);
+                string fileName = Guid.NewGuid().ToString("N") + fileExtension; // unique name so uploads never overwrite each other
                 string uploadFolderPath = Server.MapPath("~/Images/Evidence/"); // Consider using a dedicated 'Evidence' subfolder
 
                 if (!Directory.Exists(uploadFolderPath))
@@ -687,7 +696,7 @@ public partial class Homepage : System.Web.UI.Page
         int adminId = Convert.ToInt32(Session["AdminID"]);
 
         // Database connection string
-        string connStr = "Server=localhost;User Id=root;Password=root;Database=mydb;";
+        string connStr = Db.ConnectionString;
         MySqlConnection conn = new MySqlConnection(connStr);
         MySqlCommand comm = null; // Declare comm here
 
@@ -755,7 +764,18 @@ public partial class Homepage : System.Web.UI.Page
 
     protected void btnUpdate_Click(object sender, EventArgs e)
     {
-        string connStr = "Server=localhost;User Id=root;Password=root;Database=mydb;";
+        // Only the master administrator (Admin ID 0) may change administrator accounts.
+        int sessionAdminId;
+        if (Session["AdminID"] == null
+            || !int.TryParse(Session["AdminID"].ToString(), out sessionAdminId)
+            || sessionAdminId != 0)
+        {
+            Label15.ForeColor = System.Drawing.Color.Red;
+            Label15.Text = "Only the master administrator can update administrator accounts.";
+            return;
+        }
+
+        string connStr = Db.ConnectionString;
         using (MySqlConnection conn = new MySqlConnection(connStr))
         {
             try
@@ -792,7 +812,7 @@ public partial class Homepage : System.Web.UI.Page
                     // Add password parameter only if needed
                     if (!string.IsNullOrEmpty(txtPassword.Text))
                     {
-                        comm.Parameters.AddWithValue("@AdminPass", txtPassword.Text);
+                        comm.Parameters.AddWithValue("@AdminPass", PasswordHasher.Hash(txtPassword.Text.Trim()));
                     }
 
                     int rows = comm.ExecuteNonQuery();
@@ -823,7 +843,7 @@ public partial class Homepage : System.Web.UI.Page
 
     protected void Button1_Click(object sender, EventArgs e)
     {
-        string connStr = "Server=localhost;User Id=root;Password=root;Database=mydb;";
+        string connStr = Db.ConnectionString;
         MySqlConnection conn = new MySqlConnection(connStr);
 
         conn.Open();
@@ -838,7 +858,7 @@ public partial class Homepage : System.Web.UI.Page
 
     protected void Button2_Click(object sender, EventArgs e)
     {
-        string connStr = "Server=localhost;User Id=root;Password=root;Database=mydb;";
+        string connStr = Db.ConnectionString;
         MySqlConnection conn = new MySqlConnection(connStr);
 
         conn.Open();
@@ -853,7 +873,7 @@ public partial class Homepage : System.Web.UI.Page
 
     protected void Button5_Click(object sender, EventArgs e)
     {
-        string connStr = "Server=localhost;User Id=root;Password=root;Database=mydb;";
+        string connStr = Db.ConnectionString;
         MySqlConnection conn = new MySqlConnection(connStr);
 
         conn.Open();
@@ -868,7 +888,7 @@ public partial class Homepage : System.Web.UI.Page
 
     protected void Button6_Click(object sender, EventArgs e)
     {
-        string connStr = "Server=localhost;User Id=root;Password=root;Database=mydb;";
+        string connStr = Db.ConnectionString;
         MySqlConnection conn = new MySqlConnection(connStr);
 
         conn.Open();
@@ -883,17 +903,43 @@ public partial class Homepage : System.Web.UI.Page
 
     protected void Button7_Click(object sender, EventArgs e)
     {
-        string connStr = "Server=localhost;User Id=root;Password=root;Database=mydb;";
-        MySqlConnection conn = new MySqlConnection(connStr);
+        // Only the master administrator (Admin ID 0) may delete administrator accounts.
+        int sessionAdminId;
+        if (Session["AdminID"] == null
+            || !int.TryParse(Session["AdminID"].ToString(), out sessionAdminId)
+            || sessionAdminId != 0)
+        {
+            Label16.Text = "Only the master administrator can delete administrator accounts.";
+            return;
+        }
 
-        conn.Open();
+        int adminToDelete;
+        if (!int.TryParse(TextBox5.Text.Trim(), out adminToDelete))
+        {
+            Label16.Text = "Please enter a valid Admin ID.";
+            return;
+        }
 
-        string getCaseIdQuery = "DELETE FROM `administrator` WHERE Admin_ID = @adminId";
-        MySqlCommand getCaseIdCmd = new MySqlCommand(getCaseIdQuery, conn);
-        getCaseIdCmd.Parameters.AddWithValue("@adminId", TextBox5.Text);
-        getCaseIdCmd.ExecuteNonQuery();
-        Label16.Text = TextBox5.Text + " has been successfully deleted.";
-        conn.Close();
+        if (adminToDelete == 0)
+        {
+            Label16.Text = "The master administrator account cannot be deleted.";
+            return;
+        }
+
+        using (MySqlConnection conn = new MySqlConnection(Db.ConnectionString))
+        {
+            conn.Open();
+
+            using (MySqlCommand cmd = new MySqlCommand("DELETE FROM `administrator` WHERE Admin_ID = @adminId", conn))
+            {
+                cmd.Parameters.AddWithValue("@adminId", adminToDelete);
+                int rows = cmd.ExecuteNonQuery();
+
+                Label16.Text = rows > 0
+                    ? "Administrator " + adminToDelete + " has been successfully deleted."
+                    : "No administrator found with ID " + adminToDelete + ".";
+            }
+        }
     }
 
 
@@ -902,7 +948,7 @@ public partial class Homepage : System.Web.UI.Page
         string keyword = txtSearch.Text.Trim();
 
 
-        string connStr = "Server=localhost;User Id=root;Password=root;Database=mydb;";
+        string connStr = Db.ConnectionString;
         MySqlConnection conn = new MySqlConnection(connStr);
 
         conn.Open();
@@ -963,7 +1009,7 @@ public partial class Homepage : System.Web.UI.Page
         gvWitnesses.DataBind();
 
         // Admin Table
-        string searchAdmin = "SELECT * FROM administrator " +
+        string searchAdmin = "SELECT Admin_ID, Admin_First_Name, Admin_Last_Name, Phone_Num, Email FROM administrator " +
                              "WHERE Admin_ID LIKE @keyword OR Admin_First_Name LIKE @keyword OR Admin_Last_Name LIKE @keyword OR Email LIKE @keyword";
         MySqlDataAdapter adapAdmin = new MySqlDataAdapter(searchAdmin, conn);
         adapAdmin.SelectCommand.Parameters.AddWithValue("@keyword", "%" + keyword + "%");
