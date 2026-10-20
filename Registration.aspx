@@ -121,7 +121,7 @@
                         OnClick="btnRegisterAdmin_Click" />
         </div>
 
-        <asp:Button ID="btnGoToLogin" runat="server" Text="Go to Login" 
+        <asp:Button ID="btnGoToLogin" runat="server" Text="Back to Homepage" 
         Visible="False" OnClick="btnGoToLogin_Click" BackColor="White" ForeColor="Green" Height="42px" Width="296px" />
 
 

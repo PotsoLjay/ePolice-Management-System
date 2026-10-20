@@ -28,7 +28,7 @@ CREATE TABLE `administrator` (
   `Admin_Last_Name` varchar(45) DEFAULT NULL,
   `Phone_Num` varchar(45) DEFAULT NULL,
   `Email` varchar(45) DEFAULT NULL,
-  `Admin_Password` varchar(45) DEFAULT NULL,
+  `Admin_Password` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`Admin_ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -132,7 +132,7 @@ CREATE TABLE `victim` (
   PRIMARY KEY (`Victim_ID`),
   KEY `_idx` (`Case_ID`),
   KEY `FK4` (`Admin_ID`),
-  CONSTRAINT `FK4` FOREIGN KEY (`Admin_ID`) REFERENCES `administrator` (`Admin_ID`) ON DELETE CASCADE,
+  CONSTRAINT `FK4` FOREIGN KEY (`Admin_ID`) REFERENCES `administrator` (`Admin_ID`) ON DELETE SET NULL ON UPDATE CASCADE,
   CONSTRAINT `FK5` FOREIGN KEY (`Case_ID`) REFERENCES `case` (`Case_ID`) ON DELETE CASCADE ON UPDATE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 /*!40101 SET character_set_client = @saved_cs_client */;

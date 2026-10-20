@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 using System.Web.UI;
-using System.Web.UI.WebControls;
 using MySql.Data.MySqlClient;
 
 namespace EPOLICE
@@ -12,6 +8,12 @@ namespace EPOLICE
     {
         protected void Page_Load(object sender, EventArgs e)
         {
+            // Arriving on the login page (including via the Logout link) always ends any previous session.
+            if (!IsPostBack)
+            {
+                Session.Clear();
+            }
+
             if (ddlRole.SelectedItem.ToString() == "Officer")
             {
                 txtLoginAdmin.Visible = false;
@@ -26,44 +28,93 @@ namespace EPOLICE
                 lblID.Visible = true;
                 lblPassword.Visible = true;
             }
-
-
         }
 
         protected void btnLogin_Click(object sender, EventArgs e)
         {
             if (ddlRole.SelectedItem.ToString() == "Admin")
             {
-                string connStr = "Server=localhost;User Id=root;Password=root;Database=mydb;";
-                using (MySqlConnection conn = new MySqlConnection(connStr))
+                int adminId;
+                string password = txtLoginPass.Text.Trim();
+
+                if (!int.TryParse(txtLoginAdmin.Text.Trim(), out adminId) || password.Length == 0)
+                {
+                    ShowError("Invalid Admin ID or Password!");
+                    return;
+                }
+
+                bool loginOk = false;
+
+                using (MySqlConnection conn = Db.CreateConnection())
                 {
                     conn.Open();
 
-                    string query = "SELECT * FROM administrator WHERE Admin_ID = @id AND Admin_Password = @pass";
-                    MySqlCommand cmd = new MySqlCommand(query, conn);
-                    cmd.Parameters.AddWithValue("@id", txtLoginAdmin.Text.Trim());
-                    cmd.Parameters.AddWithValue("@pass", txtLoginPass.Text.Trim());
-
-                    MySqlDataReader dr = cmd.ExecuteReader();
-
-                    if (dr.HasRows) // If a row is returned → login success
+                    string storedPassword = null;
+                    using (MySqlCommand cmd = new MySqlCommand(
+                        "SELECT Admin_Password FROM administrator WHERE Admin_ID = @id", conn))
                     {
-                        Session["AdminID"] = txtLoginAdmin.Text;
-                        Response.Redirect("Homepage.aspx");
+                        cmd.Parameters.AddWithValue("@id", adminId);
+                        object result = cmd.ExecuteScalar();
+                        if (result != null && result != DBNull.Value)
+                        {
+                            storedPassword = result.ToString();
+                        }
                     }
-                    else
+
+                    if (PasswordHasher.IsHashed(storedPassword))
                     {
-                        lblMessage.Text = "Invalid Admin ID or Password!";
-                        lblMessage.ForeColor = System.Drawing.Color.Red;
+                        loginOk = PasswordHasher.Verify(password, storedPassword);
                     }
+                    else if (PasswordHasher.LegacyPlainTextMatches(password, storedPassword))
+                    {
+                        // Account created before hashing was added: accept it once, then store a hash instead.
+                        loginOk = true;
+                        UpgradeLegacyPassword(conn, adminId, password);
+                    }
+                }
+
+                if (loginOk)
+                {
+                    Session.Clear();
+                    Session["AdminID"] = adminId;
+                    Response.Redirect("Homepage.aspx");
+                }
+                else
+                {
+                    ShowError("Invalid Admin ID or Password!");
                 }
             }
             else
             {
+                Session.Clear();
                 Session["LoginState"] = "Officer";
                 Response.Redirect("Homepage.aspx");
             }
+        }
 
+        private void UpgradeLegacyPassword(MySqlConnection conn, int adminId, string password)
+        {
+            try
+            {
+                using (MySqlCommand cmd = new MySqlCommand(
+                    "UPDATE administrator SET Admin_Password = @hash WHERE Admin_ID = @id", conn))
+                {
+                    cmd.Parameters.AddWithValue("@hash", PasswordHasher.Hash(password));
+                    cmd.Parameters.AddWithValue("@id", adminId);
+                    cmd.ExecuteNonQuery();
+                }
+            }
+            catch (MySqlException)
+            {
+                // Most likely the Admin_Password column is still VARCHAR(45).
+                // Run Migrations/001_widen_admin_password.sql. Login still works in the meantime.
+            }
+        }
+
+        private void ShowError(string message)
+        {
+            lblMessage.Text = message;
+            lblMessage.ForeColor = System.Drawing.Color.Red;
         }
     }
 }
